@@ -12,7 +12,7 @@ from datetime import datetime
 import nonebot
 import requests
 from lxml import etree
-from nonebot import on_command, CommandSession
+from nonebot import on_command, on_request, CommandSession
 from aiocqhttp.exceptions import Error as CQHttpError
 import json
 
@@ -107,7 +107,7 @@ def LoadId() -> list:
 
 # 'interval', minutes=1
 # 'cron', hour='12', minute='30'
-@nonebot.scheduler.scheduled_job('cron', hour='13', minute='15')
+@nonebot.scheduler.scheduled_job('cron', hour='9', minute='0')
 async def _():
 	bot = nonebot.get_bot()
 	text = "同学打卡啦打卡啦~"
