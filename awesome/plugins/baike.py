@@ -2,16 +2,27 @@ import requests
 import random
 from lxml import etree
 from nonebot import on_command, CommandSession
+from group_ctr import *
 
+DIFFICULTY_RANK = {'简单':[1,100],'稍难':[101,200],'魔鬼':[201,500],'做出来叫你爸爸':[501,616]}
 
-DIFFICULTY_RANK = {'简单':[1,100],'稍难':[101,200],'魔鬼':[201,500],'做出来叫你爸爸':[501,702]}
+I_SOLVED = {
+	10:"答案：142913828922\n可以直接暴力枚举，各种筛法（埃拉托斯特尼筛法、欧拉筛 等）会更快"
+}
 
 # 获取欧拉计划题目
 def get_euler_url(words_list):
 	ran = random.randint(words_list[0],words_list[1])
-	url = "https://projecteuler.net/problem=%d"%(ran)
-	return url
+	# url = "https://projecteuler.net/problem=%d"%(ran)
+	url = "https://pe-cn.github.io/%d/"%(ran)
+	return url,ran
 
+# 获取答案解析
+def get_euler_sovlved(ind):
+	try:
+		return I_SOLVED.get(int(ind),-1)
+	except:
+		return -1
 
 # 从百度百科爬取内容简介
 def get_bdbk(key_words):
@@ -97,18 +108,73 @@ def get_text_wiki(msg):
 
 
 
+
+# 查询此题答案
+@on_command('答案',aliases=('题目答案','answer'))
+async def euler_ans(session: CommandSession):
+	message_type = session.ctx['message_type']
+	if message_type == 'group' and session.ctx['group_id'] == NJQ:
+		return
+
+	# 如果不是主人发的消息
+	if session.ctx['user_id'] != 814295903:
+		text = '你不是主人QAQ'
+		if (message_type == 'group'):
+			await session.bot.send_group_msg(group_id=session.ctx['group_id'], message=text)
+			# await session.bot.send_group_msg(group_id=session.ctx['group_id'], message='[CQ:at,qq=all]'+text)
+		elif (message_type == 'private'):
+			await session.bot.send_private_msg(user_id=session.ctx['user_id'], message=text)
+		return
+
+	ind = session.get('key_words', prompt='请输入题号')
+	ans = get_euler_sovlved(ind)
+	text = ""
+	if ans == -1:
+		text = "没有这题的的答案呢"
+	else:
+		text = "第%s题\n"%(ind)+ans
+
+	if (message_type == 'group'):
+		await session.bot.send_group_msg(group_id=session.ctx['group_id'], message='[CQ:at,qq=%s]\n\n'%(session.ctx['user_id'])+text)
+		# await session.bot.send_group_msg(group_id=session.ctx['group_id'], message='[CQ:at,qq=all]'+text)
+	elif (message_type == 'private'):
+		await session.bot.send_private_msg(user_id=session.ctx['user_id'], message=text)
+
+
+
+
+# 欧拉计划出题
 @on_command('编程题',aliases=('出题','编程数学题'))
 async def euler(session: CommandSession):
 	message_type = session.ctx['message_type']
-	key_words = session.get('key_words', prompt='（PS：题目都是英文题面）\n请选择难度:\n- 简单（其实不简单）\n- 稍难（其实很难）\n- 魔鬼\n- 做出来叫你爸爸')
+	if message_type == 'group' and session.ctx['group_id'] == NJQ:
+		return
+	if session.ctx['user_id'] != 814295903:
+		text = '你不是主人QAQ'
+		if (message_type == 'group'):
+			await session.bot.send_group_msg(group_id=session.ctx['group_id'], message=text)
+			# await session.bot.send_group_msg(group_id=session.ctx['group_id'], message='[CQ:at,qq=all]'+text)
+		elif (message_type == 'private'):
+			await session.bot.send_private_msg(user_id=session.ctx['user_id'], message=text)
+		return
 
+	key_words = session.get('key_words', prompt='\n请选择难度:\n- 简单（其实不简单）\n- 稍难（其实很难）\n- 魔鬼\n- 做出来叫你爸爸\n\n或者直接输入题号')
 	text = ""
-	dif = DIFFICULTY_RANK.get(key_words,-1)
-	if  dif == -1:
-		text += "没有这种难度哦~" 
+
+	if key_words.isdigit():
+		if int(key_words) > 616 or int(key_words) < 1:
+			text += "超出题目范围QAQ"
+		else:
+			q = get_euler_url([int(key_words),int(key_words)])
+			text += "[CQ:emoji,id=128161]第%d题\n题目链接：\n%s"%(q[1],q[0])
 	else:
-		text += "[%s]难度 题目链接：\n"%(key_words)
-		text += get_euler_url(dif)
+		dif = DIFFICULTY_RANK.get(key_words,-1)
+		if  dif == -1:
+			text += "没有这种难度哦~"
+		else:
+			q = get_euler_url(dif)
+			text += "[%s]难度\n[CQ:emoji,id=128161]本题选自Project Euler第%d题\n题目链接：\n%s"%(key_words,q[1],q[0])
+
 
 	if (message_type == 'group'):
 		await session.bot.send_group_msg(group_id=session.ctx['group_id'], message='[CQ:at,qq=%s]\n\n'%(session.ctx['user_id'])+text)
@@ -122,6 +188,8 @@ async def euler(session: CommandSession):
 @on_command('百科')
 async def baike(session: CommandSession):
 	message_type = session.ctx['message_type']
+	if message_type == 'group' and session.ctx['group_id'] == NJQ:
+		return
 	key_words = session.get('key_words', prompt='请输入关键字')
 	
 	text = "请稍等……"
@@ -134,9 +202,9 @@ async def baike(session: CommandSession):
 	wkbk_msg = get_wkbk(key_words)
 
 	msg = ""
-	msg += "\n百度百科：\r\n" + get_text(bdbk_msg) +"\r\n\n"
+	msg += "\n[CQ:emoji,id=128161]百度百科：\r\n" + get_text(bdbk_msg) +"\r\n\n"
 	msg += "-"*40
-	msg += "\n维基百科中文站：\r\n" + get_text_wiki(wkbk_msg) +"\r\nPS:出现乱码请自动无视\r\n\n"
+	msg += "\n[CQ:emoji,id=128161]维基百科中文站：\r\n" + get_text_wiki(wkbk_msg) +"\r\n\nPS:出现乱码请自动无视\r\n\n"
 	msg += "-"*40
 
 	text = msg
@@ -151,6 +219,7 @@ async def baike(session: CommandSession):
 # 手写参数解析器
 @baike.args_parser
 @euler.args_parser
+@euler_ans.args_parser
 async def _(session:CommandSession):
 	stripped_arg = session.current_arg_text.strip()
 
@@ -169,5 +238,7 @@ async def _(session:CommandSession):
 
 if __name__ == '__main__':
 
-	msg = get_wkbk("pink")
-	print(get_text_wiki(msg))
+	# msg = get_wkbk("pink")
+	# print(get_text_wiki(msg))
+
+	print(get_euler_url(DIFFICULTY_RANK.get("简单")))

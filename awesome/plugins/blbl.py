@@ -1,6 +1,8 @@
 import requests
 from lxml import etree
 from nonebot import on_command, CommandSession
+from group_ctr import *
+
 
 BILI_RANK = {
 	"全站":0,
@@ -133,6 +135,8 @@ def get_text(msg, num):
 @on_command('bday', aliases=('b站日榜','b日榜','B站日榜','B日榜'))
 async def blbl_rank(session: CommandSession):
 	message_type = session.ctx['message_type']
+	if message_type == 'group' and session.ctx['group_id'] == NJQ:
+		return
 	key_words = session.get('key_words', prompt='请输入B站日榜关键字\n目前支持关键字：全站/动画/国创/音乐/舞蹈/游戏/科技/数码/生活/鬼畜/时尚/娱乐/影视')
 	text = "请稍等……"
 	if (message_type == 'group'):
@@ -165,10 +169,12 @@ async def blbl_rank(session: CommandSession):
 
 
 
-# 从qq客户端获取用户输入的关键字，并进行查询
+# 获取b站搜索的关键字，并进行查询
 @on_command('b', aliases=('blbl','bilibili','b站','B站','bili'))
 async def blbl(session: CommandSession):
 	message_type = session.ctx['message_type']
+	if message_type == 'group' and session.ctx['group_id'] == NJQ:
+		return
 	key_words = session.get('key_words', prompt='请输入B站视频搜索关键字')
 	
 	text = "请稍等……"

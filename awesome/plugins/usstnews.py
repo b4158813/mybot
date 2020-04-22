@@ -1,7 +1,7 @@
 import requests
 from lxml import etree
 from nonebot import on_command, CommandSession
-
+from group_ctr import *
 
 
 # 爬取上理校务新闻
@@ -33,7 +33,7 @@ def get_school_affairs():
 	for i in range(len(news_date)):
 		# 内容，日期，链接
 		if news_url[i][0]=='/':
-			news_url[i] = "http://jwc.usst.edu.cn"+news_url[i]
+			news_url[i] = "http://www.usst.edu.cn"+news_url[i]
 		res.append([news_content[i],news_date[i],news_url[i]])
 	# print(res)
 	return res
@@ -93,12 +93,16 @@ def get_text(msg, num):
 
 @on_command('校务新闻',aliases=('usst新闻','上理新闻','USST新闻','学校新闻','学校最新消息'))
 async def school_affairs(session: CommandSession):
+	message_type = session.ctx['message_type']
+	if message_type == 'group' and session.ctx['group_id'] == NJQ:
+		return
+
 	msg = get_school_affairs()
 	text = msg
 	if text!="爬取失败！":
-		text = "USST最新新闻（获取前5条）：\r\n"
-		text += get_text(msg,5)
-	message_type = session.ctx['message_type']
+		text = "USST最新新闻（获取前4条）：\r\n"
+		text += get_text(msg,4)
+	
 	if (message_type == 'group'):
 		await session.bot.send_group_msg(group_id=session.ctx['group_id'], message=text)
 	elif (message_type == 'private'):
@@ -107,12 +111,16 @@ async def school_affairs(session: CommandSession):
 
 @on_command('教务处',aliases=('教务处新闻','上理教务处','教务处消息','jwc'))
 async def jwc_affairs(session: CommandSession):
+	message_type = session.ctx['message_type']
+	if message_type == 'group' and session.ctx['group_id'] == NJQ:
+		return
+		
 	msg = get_jwcnews()
 	text = msg
 	if text!="爬取失败！":
-		text = "上理教务处最新消息（获取前8条）：\r\n"
-		text += get_text(msg,8)
-	message_type = session.ctx['message_type']
+		text = "上理教务处最新消息（获取前4条）：\r\n"
+		text += get_text(msg,4)
+	
 	if (message_type == 'group'):
 		await session.bot.send_group_msg(group_id=session.ctx['group_id'], message=text)
 	elif (message_type == 'private'):
