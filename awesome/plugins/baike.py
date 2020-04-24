@@ -7,8 +7,8 @@ from group_ctr import *
 DIFFICULTY_RANK = {'简单':[1,100],'稍难':[101,200],'魔鬼':[201,500],'做出来叫你爸爸':[501,616]}
 
 I_SOLVED = {
-	10:"答案：142913828922\n算法：可以直接暴力枚举，各种筛法（埃拉托斯特尼筛法、欧拉筛 等）会更快",
-	14:"答案：837799\n算法：直接暴力即可"
+	10:"答案：142913828922\n算法：Easy, 可以直接暴力枚举，各种筛法（埃拉托斯特尼筛法、欧拉筛 等）会更快",
+	14:"答案：837799\n算法：Easy, 直接暴力即可"
 }
 
 # 获取欧拉计划题目
@@ -62,13 +62,13 @@ def get_wkbk(key_words):
 	try:
 		r = requests.get(url,timeout=5,headers=headers)
 	except:
-		return ['爬取失败']
+		return ['爬取失败！']
 
 	cnt = 0
 	while r.status_code!=200:
 		cnt += 1
 		if cnt >= 3:
-			return ["爬取失败！"]
+			return ["爬取失败！（没有指定词条 or 我的科学上网挂了）"]
 		r = requests.get(url,timeout=5,headers=headers)
 
 	r.encoding = 'utf-8'
@@ -205,8 +205,9 @@ async def baike(session: CommandSession):
 	msg = ""
 	msg += "\n[CQ:emoji,id=128161]百度百科：\r\n" + get_text(bdbk_msg) +"\r\n\n"
 	msg += "-"*40
-	msg += "\n[CQ:emoji,id=128161]维基百科中文站：\r\n" + get_text_wiki(wkbk_msg) +"\r\n\nPS:出现乱码请自动无视\r\n\n"
+	msg += "\n[CQ:emoji,id=128161]维基百科中文站：\r\n" + get_text_wiki(wkbk_msg) +"\r\n\nPS:维基百科不太稳定可能获取失败，出现乱码请自动无视，\r\n\n"
 	msg += "-"*40
+	msg += "\n中文词条可能链接没法打开，手动把“/”后面的关键字都选中然后访问即可"
 
 	text = msg
 	if (message_type == 'group'):
