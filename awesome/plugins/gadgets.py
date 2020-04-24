@@ -20,7 +20,7 @@ from group_ctr import * # 群组控制
 
 
 # 机器人名字
-nn = '愣头'
+nn = '人民公仆'
 
 # 获取当前时间 的 时分秒
 # def GetTime(time=datetime.now())->list:
@@ -42,7 +42,7 @@ async def vpn(session: CommandSession):
 
 
 # 健康打卡通知
-@on_command('通知我')
+@on_command('通知我',aliases=('提醒我'))
 async def notice_me(session: CommandSession):
 	message_type = session.ctx['message_type']
 	if message_type == 'private':
@@ -64,14 +64,14 @@ async def notice_me(session: CommandSession):
 		fp.write(item_json)
 		fp.close()
 		file.close()
-		await session.bot.send_private_msg(user_id=self_id, message="将在每日九点提醒您打卡！")
+		await session.bot.send_private_msg(user_id=self_id, message="将在每日9:50提醒您打卡！")
 	else:
-		await session.bot.send_private_msg(user_id=session.ctx['user_id'], message="来来来这位童鞋看过来\n\n输入：通知我\n（每天9点提醒你打卡）\n\n输入：取消通知我\n（取消每天通知你）")
+		await session.bot.send_private_msg(user_id=session.ctx['user_id'], message="来来来这位童鞋看过来\n\n输入：通知我\n（每天9：50提醒你打卡）\n\n输入：取消通知我\n（取消每天通知你）")
 
 
 
 # 取消通知
-@on_command('取消通知我')
+@on_command('取消通知我',aliases=('取消提醒我'))
 async def notice_me(session: CommandSession):
 	message_type = session.ctx['message_type']
 	if message_type == 'private':
@@ -107,7 +107,7 @@ def LoadId() -> list:
 
 # 'interval', minutes=1
 # 'cron', hour='12', minute='30'
-@nonebot.scheduler.scheduled_job('cron', hour='9', minute='0')
+@nonebot.scheduler.scheduled_job('cron', hour='9', minute='50')
 async def _():
 	bot = nonebot.get_bot()
 	text = "同学打卡啦打卡啦~"
@@ -145,10 +145,9 @@ async def vpn(session: CommandSession):
 （获取上理vpn链接网址）
 
 - {0} 通知我
-（打卡提醒！机器人会私聊你然后按操作来）
-PS:此功能尚未完善
+（打卡提醒！加我为好友才能使用）
 ----------------------------------------
-更多功能请私聊我输入“{0} 功能”获取
+更多功能请加我为好友输入“功能”获取
 '''.format(nn)
 		await session.bot.send_group_msg(group_id=session.ctx['group_id'], message=text)
 		return
@@ -158,8 +157,6 @@ PS:此功能尚未完善
 
 目前支持的功能有：
 ----------------------------------------
-> 群功能：
-
 - 点歌 xxx
 （自动从QQ音乐获取该歌曲）
 
@@ -185,10 +182,11 @@ PS:此功能尚未完善
 （隐藏功能，只有主人可以用）
 
 - {0} 通知我
-（打卡提醒！机器人会私聊你然后按操作来）
+（打卡提醒！加我为好友才能使用）
 PS:此功能尚未完善
 ----------------------------------------
 如果有bug请反馈给我的主人
+QQ:814295903
 更多垃圾功能敬请期待……
 	'''.format(nn)
 

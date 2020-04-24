@@ -8,4 +8,4 @@ PORT = 8080
 
 HOST = '127.0.0.1'
 
-NICKNAME = {'愣头'}
+NICKNAME = {'人民公仆'}
