@@ -105,18 +105,34 @@ def LoadId() -> list:
 
 
 
+# 这种垃圾代码拿出来误人子弟
+# @nonebot.scheduler.scheduled_job('cron', hour='10', minute='15')
+# async def _():
+# 	bot = nonebot.get_bot()
+# 	text = "测试1"
+# 	ID = [111,222,814295903,222,444]
+#   try:
+# 		for it in ID:
+# 			await bot.send_private_msg(user_id=it, message=text)
+# 	except CQHttpError:
+# 		pass
+
+
+
+
 # 'interval', minutes=1
 # 'cron', hour='12', minute='30'
+# 2020.4.25 修复
 @nonebot.scheduler.scheduled_job('cron', hour='9', minute='50')
 async def _():
 	bot = nonebot.get_bot()
 	text = "同学打卡啦打卡啦~"
-	try:
-		ID = LoadId()
-		for it in ID:
+	ID = LoadId()
+	for it in ID:
+		try:
 			await bot.send_private_msg(user_id=it, message=text)
-	except CQHttpError:
-		pass
+		except:
+			pass
 
 
 

@@ -1,5 +1,6 @@
 # mybot
-- 该机器人原理是：基于 酷Q + Python + nonebot异步QQ机器人框架
+
+该机器人原理是：基于 酷Q + Python + nonebot异步QQ机器人框架
 
 当然这个repo里面没有酷Q，具体可以到[酷Q版本发布](https://cqp.cc/b/news)查看更新和下载
 
